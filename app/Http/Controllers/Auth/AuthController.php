@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\Interfaces\AuthRepositoryInterface;
 
 class AuthController extends Controller
 {
+    protected $authRepository;
+    
+    public function __construct(AuthRepositoryInterface $authRepository)
+    {
+        $this->authRepository = $authRepository;
+    }
+    
     public function showLoginForm()
     {
         return view('auth.login');
@@ -25,7 +33,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
         
-        if (Auth::attempt($credentials, $remember)) {
+        if ($this->authRepository->attemptLogin($credentials, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
         }
@@ -48,23 +56,16 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
         
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $userData = $request->only('name', 'email', 'password');
         
-        Auth::login($user);
+        $this->authRepository->register($userData);
         
         return redirect(route('dashboard'));
     }
     
     public function logout(Request $request)
     {
-        Auth::logout();
-        
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->authRepository->logout($request);
         
         return redirect('/');
     }

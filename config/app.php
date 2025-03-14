@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Facade;
+
 return [
 
     /*
@@ -123,12 +125,55 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    // 'providers' => [
-    //     Laravel\Socialite\SocialiteServiceProvider::class,
-    // ],
+    'providers' => [
+        /*
+    * Laravel Framework Service Providers...
+    */
+        Illuminate\Auth\AuthServiceProvider::class,
+        Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        Illuminate\Bus\BusServiceProvider::class,
+        Illuminate\Cache\CacheServiceProvider::class,
+        Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+        Illuminate\Cookie\CookieServiceProvider::class,
+        Illuminate\Database\DatabaseServiceProvider::class,
+        Illuminate\Encryption\EncryptionServiceProvider::class,
+        Illuminate\Filesystem\FilesystemServiceProvider::class,
+        Illuminate\Foundation\Providers\FoundationServiceProvider::class,
+        Illuminate\Hashing\HashServiceProvider::class,
+        Illuminate\Mail\MailServiceProvider::class,
+        Illuminate\Notifications\NotificationServiceProvider::class,
+        Illuminate\Pagination\PaginationServiceProvider::class,
+        Illuminate\Pipeline\PipelineServiceProvider::class,
+        Illuminate\Queue\QueueServiceProvider::class,
+        Illuminate\Redis\RedisServiceProvider::class,
+        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+        Illuminate\Session\SessionServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\View\ViewServiceProvider::class,
 
-    // 'aliases' => [
-    //     'Socialite' => Laravel\Socialite\Facades\Socialite::class,
-    // ],
+        /*
+    * Package Service Providers...
+    */
+        Laravel\Socialite\SocialiteServiceProvider::class, // Only if you're using Socialite
+
+        /*
+    * Application Service Providers...
+    */
+        App\Providers\AppServiceProvider::class,
+        // App\Providers\AuthServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class, // Comment out if not using broadcasting
+        // App\Providers\EventServiceProvider::class,
+        // App\Providers\RouteServiceProvider::class,
+
+        /*
+    * Your Custom Service Providers...
+    */
+        App\Providers\RepositoryServiceProvider::class,
+    ],
+    'aliases' => Facade::defaultAliases()->merge([
+        // Your aliases here, for example:
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class, // Only if using Socialite
+    ])->toArray(),
 
 ];

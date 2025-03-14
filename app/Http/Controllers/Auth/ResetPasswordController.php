@@ -1,36 +1,23 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use App\Repositories\Interfaces\AuthRepositoryInterface;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
-class PasswordResetController extends Controller
+class ResetPasswordController extends Controller
 {
-    public function showForgotPasswordForm()
+    protected $authRepository;
+    
+    public function __construct(AuthRepositoryInterface $authRepository)
     {
-        return view('auth.forgot-password');
+        $this->authRepository = $authRepository;
     }
-
-    public function sendResetLinkEmail(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
-    }
-
+    
     public function showResetForm(Request $request)
     {
         return view('auth.reset-password', ['request' => $request]);
@@ -44,7 +31,7 @@ class PasswordResetController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $status = Password::reset(
+        $status = $this->authRepository->resetPassword(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([

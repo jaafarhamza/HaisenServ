@@ -4,10 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\GoogleController;
+use Laravel\Socialite\Facades\Socialite;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('welcome');
+});
 Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -16,24 +17,27 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
-    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm'])
+    // Forgot Password 
+    Route::get('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showForgotPasswordForm'])
         ->name('password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])
+    Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
         ->name('password.email');
-    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])
+
+    // Reset Password 
+    Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])
         ->name('password.reset');
-    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+    Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])
         ->name('password.update');
 });
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+// Route::get('/dashboard', function () {
+//     return view('admin.dashboard');
+// })->name('admin.dashboard');
 
 // Route::middleware('auth')->group(function () {
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->name('dashboard');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
 // Dashboard
 // Route::get('/dashboard', function () {
@@ -109,6 +113,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Google login routes
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+
+
+
 
 // just views
 
