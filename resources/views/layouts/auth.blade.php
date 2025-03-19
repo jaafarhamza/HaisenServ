@@ -560,31 +560,6 @@
                 }
             }
 
-            // Button loading animation
-            // function setupButtonLoadingState() {
-            //     const buttons = document.querySelectorAll('button[type="submit"]');
-            //     buttons.forEach(button => {
-            //         button.addEventListener('click', function(e) {
-            //             const form = this.closest('form');
-            //             if (form && form.checkValidity()) {
-            //                 const originalText = this.innerHTML;
-            //                 this.classList.add('pointer-events-none');
-            //                 this.setAttribute('disabled', 'disabled');
-            //                 this.innerHTML =
-            //                     `<div class="loading-dots"><span></span><span></span><span></span></div>`;
-
-            //                 setTimeout(() => {
-            //                     if (this.getAttribute('disabled')) {
-            //                         this.removeAttribute('disabled');
-            //                         this.classList.remove('pointer-events-none');
-            //                         this.innerHTML = originalText;
-            //                     }
-            //                 }, 8000);
-            //             }
-            //         });
-            //     });
-            // }
-
             // Input field animations
             function setupInputAnimations() {
                 const inputs = document.querySelectorAll('.input-field');

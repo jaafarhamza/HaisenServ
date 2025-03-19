@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->bind(GoogleAuthRepositoryInterface::class, GoogleAuthRepository::class);
+        
     }
 
     /**
@@ -27,6 +28,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app['router']->aliasMiddleware('role_permission', \App\Http\Middleware\CheckRolePermission::class);
     }
 }
