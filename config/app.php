@@ -155,6 +155,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
 
         App\Providers\AppServiceProvider::class,
+        App\Providers\RolesServiceProvider::class,
         // App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class, 
         // App\Providers\EventServiceProvider::class,
@@ -163,6 +164,15 @@ return [
     ],
     'aliases' => Facade::defaultAliases()->merge([
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        // 'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
     ])->toArray(),
 
 ];

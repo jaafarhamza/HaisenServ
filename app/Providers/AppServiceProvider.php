@@ -28,6 +28,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app['router']->aliasMiddleware('role_permission', \App\Http\Middleware\CheckRolePermission::class);
+        
     }
 }

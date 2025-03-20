@@ -36,7 +36,7 @@ class AuthController extends Controller
 
         if ($this->authRepository->attemptLogin($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
@@ -61,7 +61,7 @@ class AuthController extends Controller
 
         $this->authRepository->register($userData);
 
-        return redirect(route('dashboard'));
+        return redirect(route('admin.dashboard'));
     }
 
     public function logout(Request $request)

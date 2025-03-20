@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -74,6 +75,44 @@ class UserRepository implements UserRepositoryInterface
                 'avatar' => $userData['avatar'] ?? null,
             ]);
         }
+        
+        return $user;
+    }
+    
+    public function assignRoleToUser(User $user, string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+        
+        if ($role) {
+            $user->assignRole($role);
+        }
+    }
+
+    public function removeRoleFromUser(User $user, string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+        
+        if ($role) {
+            $user->removeRole($role);
+        }
+    }
+
+    public function getUsersWithRole(string $roleName): Collection
+    {
+        $role = Role::where('name', $roleName)->first();
+        
+        if ($role) {
+            return $role->users;
+        }
+        
+        return collect();
+    }
+
+    // create a user with a specific role
+    public function createUserWithRole(array $data, string $roleName): User
+    {
+        $user = $this->createUser($data);
+        $this->assignRoleToUser($user, $roleName);
         
         return $user;
     }

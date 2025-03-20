@@ -15,4 +15,9 @@ interface UserRepositoryInterface
     public function updateUser(User $user, array $data): bool;
     public function deleteUser(int $id): bool;
     public function findOrCreateGoogleUser(array $userData): User;
+
+    public function assignRoleToUser(User $user, string $roleName): void;
+    public function removeRoleFromUser(User $user, string $roleName): void;
+    public function getUsersWithRole(string $roleName): Collection;
+    public function createUserWithRole(array $data, string $roleName): User;
 }
