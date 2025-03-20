@@ -24,7 +24,7 @@
         </a>
         
         <!-- Users Icon -->
-        <a href="#" class="sidebar-icon {{ request()->routeIs('admin.users.*') ? 'active-link' : '' }}">
+        <a href="{{ route('admin.users.index') }}" class="sidebar-icon {{ request()->routeIs('admin.users.*') ? 'active-link' : '' }}">
             <i class="fas fa-users"></i>
             <span class="sidebar-tooltip group-hover:scale-100">Users</span>
         </a>

@@ -34,9 +34,13 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        if ($this->authRepository->attemptLogin($credentials, $remember)) {
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+            
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return view("homepage");
         }
 
         return back()->withErrors([
@@ -68,6 +72,6 @@ class AuthController extends Controller
     {
         $this->authRepository->logout($request);
 
-        return redirect('/');
+        return redirect('/welcome');
     }
 }

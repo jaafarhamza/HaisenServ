@@ -27,43 +27,50 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Stats Overview -->
     @php
         $stats = [
-            // [
-            //     'title' => 'Total Users',
-            //     'value' => $usersCount,
-            //     'icon' => 'users',
-            //     'color' => 'highlight',
-            //     'change' => $usersChange,
-            // ],
-            // [
-            //     'title' => 'Service Providers',
-            //     'value' => $providersCount,
-            //     'icon' => 'user-tie',
-            //     'color' => 'tertiary',
-            //     'change' => $providersChange,
-            // ],
-            // [
-            //     'title' => 'Active Services',
-            //     'value' => $servicesCount,
-            //     'icon' => 'concierge-bell',
-            //     'color' => 'blue-500',
-            //     'change' => $servicesChange,
-            // ],
-            // [
-            //     'title' => 'Total Bookings',
-            //     'value' => $bookingsCount,
-            //     'icon' => 'calendar-check',
-            //     'color' => 'purple-500',
-            //     'change' => $bookingsChange,
-            // ],
+            [
+                'title' => 'Total Users',
+                'value' => $usersCount,
+                'icon' => 'users',
+                'color' => 'highlight',
+                'change' => $usersChange,
+            ],
+            [
+                'title' => 'Admin Users',
+                'value' => $adminCount,
+                'icon' => 'user-shield',
+                'color' => 'tertiary',
+                'change' => $adminChange ?? 0,
+            ],
+            [
+                'title' => 'Provider Users',
+                'value' => $providerCount,
+                'icon' => 'user-tie',
+                'color' => 'blue-500',
+                'change' => $providerChange ?? 0,
+            ],
+            [
+                'title' => 'Clients',
+                'value' => $clientCount,
+                'icon' => 'user',
+                'color' => 'purple-500',
+                'change' => $clientCount ?? 0,
+            ],
+            [
+                'title' => 'Users Without Roles',
+                'value' => $usersWithoutRolesCount,
+                'icon' => 'user-slash',
+                'color' => 'red-500',
+                'change' => $usersWithoutRolesChange ?? 0,
+            ],
         ];
     @endphp
-    
+
     @include('admin.partials.stats-cards', ['stats' => $stats])
-    
+
     <!-- Recent Activity and User Roles -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Recent Activity -->
@@ -72,12 +79,12 @@
                 @slot('header')
                     Recent Activity
                 @endslot
-                
+
                 <div class="space-y-4">
                     {{-- @forelse($recentActivities as $activity)
                         <div class="flex items-start">
                             <div class="h-10 w-10 rounded-full bg-bgPrimary mr-4 flex-shrink-0 flex items-center justify-center">
-                                @if($activity->log_name == 'user')
+                                @if ($activity->log_name == 'user')
                                     <i class="fas fa-user text-highlight"></i>
                                 @elseif($activity->log_name == 'role')
                                     <i class="fas fa-user-shield text-tertiary"></i>
@@ -101,17 +108,17 @@
                             </div>
                         </div>
                     @empty --}}
-                        <div class="flex flex-col items-center justify-center py-6">
-                            <div class="h-16 w-16 bg-bgPrimary rounded-full flex items-center justify-center mb-4">
-                                <i class="fas fa-history text-secondary text-2xl"></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-textHeading mb-1">No recent activity</h3>
-                            <p class="text-textParagraph">Activities will appear here as you use the system.</p>
+                    <div class="flex flex-col items-center justify-center py-6">
+                        <div class="h-16 w-16 bg-bgPrimary rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-history text-secondary text-2xl"></i>
                         </div>
+                        <h3 class="text-lg font-medium text-textHeading mb-1">No recent activity</h3>
+                        <p class="text-textParagraph">Activities will appear here as you use the system.</p>
+                    </div>
                     {{-- @endforelse --}}
                 </div>
-                
-                {{-- @if($recentActivities->isNotEmpty())
+
+                {{-- @if ($recentActivities->isNotEmpty())
                     @slot('footer')
                         <div class="text-center">
                             <a href="#" class="text-highlight hover:underline">
@@ -122,16 +129,16 @@
                 @endif --}}
             @endcomponent
         </div>
-        
+
         <!-- User Roles Distribution -->
         <div>
             @component('admin.components.card')
                 @slot('header')
                     User Roles Distribution
                 @endslot
-                
+
                 <div class="space-y-4">
-                    @foreach($roleDistribution as $role)
+                    @foreach ($roleDistribution as $role)
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <div class="flex items-center">
@@ -146,7 +153,8 @@
                                     <div class="h-3 w-3 rounded-full bg-{{ $color }} mr-2"></div>
                                     <span class="text-sm font-medium text-textHeading">{{ ucfirst($role['name']) }}</span>
                                 </div>
-                                <span class="text-sm text-textParagraph">{{ $role['count'] }} ({{ $role['percentage'] }}%)</span>
+                                <span class="text-sm text-textParagraph">{{ $role['count'] }}
+                                    ({{ $role['percentage'] }}%)</span>
                             </div>
                             <div class="h-2 bg-bgPrimary rounded-full overflow-hidden">
                                 <div class="h-full bg-{{ $color }}" style="width: {{ $role['percentage'] }}%"></div>
@@ -154,7 +162,7 @@
                         </div>
                     @endforeach
                 </div>
-                
+
                 @slot('footer')
                     <div class="text-center">
                         <a href="#" class="text-highlight hover:underline">
@@ -163,36 +171,40 @@
                     </div>
                 @endslot
             @endcomponent
-            
+
             <!-- Quick Links -->
             @component('admin.components.card', ['class' => 'mt-6'])
                 @slot('header')
                     Quick Links
                 @endslot
-                
+
                 <div class="grid grid-cols-2 gap-4">
-                    <a href="{{ route('admin.roles.index') }}" class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
+                    <a href="{{ route('admin.roles.index') }}"
+                        class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
                         <div class="h-12 w-12 rounded-full bg-highlight bg-opacity-20 flex items-center justify-center mb-2">
                             <i class="fas fa-user-shield text-highlight"></i>
                         </div>
                         <span class="text-sm font-medium text-textHeading">Roles</span>
                     </a>
-                    
-                    <a href="{{ route('admin.permissions.index') }}" class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
+
+                    <a href="{{ route('admin.permissions.index') }}"
+                        class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
                         <div class="h-12 w-12 rounded-full bg-tertiary bg-opacity-20 flex items-center justify-center mb-2">
                             <i class="fas fa-key text-tertiary"></i>
                         </div>
                         <span class="text-sm font-medium text-textHeading">Permissions</span>
                     </a>
-                    
-                    <a href="#" class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
+
+                    <a href="{{ route('admin.users.index') }}"
+                        class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
                         <div class="h-12 w-12 rounded-full bg-blue-500 bg-opacity-20 flex items-center justify-center mb-2">
                             <i class="fas fa-users text-blue-500"></i>
                         </div>
                         <span class="text-sm font-medium text-textHeading">Users</span>
                     </a>
-                    
-                    <a href="#" class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
+
+                    <a href="#"
+                        class="p-4 bg-bgPrimary rounded-lg hover:bg-opacity-80 transition-all flex flex-col items-center justify-center">
                         <div class="h-12 w-12 rounded-full bg-purple-500 bg-opacity-20 flex items-center justify-center mb-2">
                             <i class="fas fa-concierge-bell text-purple-500"></i>
                         </div>

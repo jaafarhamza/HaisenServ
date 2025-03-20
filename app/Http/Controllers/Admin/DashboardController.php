@@ -14,30 +14,34 @@ class DashboardController extends Controller
     {
         // User statistics
         $usersCount = User::count();
-        $providersCount = User::whereHas('roles', function($query) {
+        $adminCount = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->count();
+        $providerCount = User::whereHas('roles', function ($query) {
             $query->where('name', 'provider');
         })->count();
-        $clientsCount = User::whereHas('roles', function($query) {
+        $clientCount = User::whereHas('roles', function ($query) {
             $query->where('name', 'client');
         })->count();
-        
+        $usersWithoutRolesCount = User::doesntHave('roles')->count();
+
         $rolesCount = Role::count();
         $permissionsCount = Permission::count();
-        
-        $servicesCount = 87; 
-        $bookingsCount = 256; 
-        
+
+        $servicesCount = 87;
+        $bookingsCount = 256;
+
         $usersChange = 12;
         $providersChange = 5;
         $servicesChange = -3;
         $bookingsChange = 15;
-        
+
         // Role distribution
         $roleDistribution = Role::withCount('users')
             ->get()
-            ->map(function($role) use ($usersCount) {
+            ->map(function ($role) use ($usersCount) {
                 $percentage = $usersCount > 0 ? round(($role->users_count / $usersCount) * 100, 1) : 0;
-                
+
                 return [
                     'name' => $role->name,
                     'count' => $role->users_count,
@@ -47,11 +51,12 @@ class DashboardController extends Controller
             ->sortByDesc('count')
             ->values()
             ->all();
-        
+
         return view('admin.dashboard', compact(
             'usersCount',
-            'providersCount',
-            'clientsCount',
+            'providerCount',
+            'clientCount',
+            'adminCount',
             'rolesCount',
             'permissionsCount',
             'servicesCount',
@@ -60,7 +65,8 @@ class DashboardController extends Controller
             'providersChange',
             'servicesChange',
             'bookingsChange',
-            'roleDistribution'
+            'roleDistribution',
+            'usersWithoutRolesCount'
         ));
     }
 }

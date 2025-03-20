@@ -17,7 +17,7 @@ class CheckRole
     {
         if (!$request->user() || !$request->user()->hasRole($role)) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Unauthorized.'], 403);
+                return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
             }
             
             abort(403, 'You do not have permission to access this page.');

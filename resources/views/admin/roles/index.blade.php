@@ -120,9 +120,6 @@
                     <td class="table-cell">{{ $role->created_at->format('Y-m-d') }}</td>
                     <td class="table-cell text-right">
                         <div class="flex justify-end space-x-2">
-                            <a href="{{ route('admin.roles.show', $role->id) }}" class="btn-secondary py-1 px-2" title="View">
-                                <i class="fas fa-eye"></i>
-                            </a>
                             <button class="btn-primary py-1 px-2" title="Edit" 
                                     onclick="showModal('edit-role-modal-{{ $role->id }}')">
                                 <i class="fas fa-edit"></i>
