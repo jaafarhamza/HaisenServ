@@ -1,7 +1,7 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 mb-6">
     @foreach($stats as $stat)
     <div class="card p-6">
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-center">
             <div>
                 <p class="text-sm text-secondary">{{ $stat['title'] }}</p>
                 <h3 class="text-3xl font-bold text-textHeading">{{ $stat['value'] }}</h3>

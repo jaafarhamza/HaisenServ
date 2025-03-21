@@ -57,7 +57,7 @@
                         </svg>
                         <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}"
                               class="input-field text-sm py-2"
-                              placeholder="you@example.com">
+                              placeholder="HaisenServ@example.com">
                     </div>
                 </div>
             </div>
