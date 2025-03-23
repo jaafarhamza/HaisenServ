@@ -5,10 +5,12 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Admin\CategoryStatisticsController;
 
 Route::get('/welcome', function () {
     return view('welcome');
@@ -38,14 +40,6 @@ Route::middleware('guest')->group(function () {
 Route::get('login/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
 Route::get('login/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/dashboard', function () {
-//         return view('dashboard');
-//     })->name('dashboard');
-
-//     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// });
-
 // Test 
 Route::get('/test-route', function () {
     return 'Test route is working!';
@@ -65,5 +59,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('permissions/{permission}/assign-to-roles', [PermissionController::class, 'assignToRoles'])->name('permissions.assign-to-roles');
 
     Route::resource('users', UserController::class);
+    
+    Route::resource('categories', CategoryController::class);
+    
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Category;
 use App\Models\Permission;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {
@@ -14,19 +15,13 @@ class DashboardController extends Controller
     {
         // User statistics
         $usersCount = User::count();
-        $adminCount = User::whereHas('roles', function ($query) {
-            $query->where('name', 'admin');
-        })->count();
+        
         $providerCount = User::whereHas('roles', function ($query) {
             $query->where('name', 'provider');
         })->count();
         $clientCount = User::whereHas('roles', function ($query) {
             $query->where('name', 'client');
         })->count();
-        $usersWithoutRolesCount = User::doesntHave('roles')->count();
-
-        $rolesCount = Role::count();
-        $permissionsCount = Permission::count();
 
         $servicesCount = 87;
         $bookingsCount = 256;
@@ -35,6 +30,7 @@ class DashboardController extends Controller
         $providersChange = 5;
         $servicesChange = -3;
         $bookingsChange = 15;
+        $categoriesChange = 4;
 
         // Role distribution
         $roleDistribution = Role::withCount('users')
@@ -56,9 +52,6 @@ class DashboardController extends Controller
             'usersCount',
             'providerCount',
             'clientCount',
-            'adminCount',
-            'rolesCount',
-            'permissionsCount',
             'servicesCount',
             'bookingsCount',
             'usersChange',
@@ -66,7 +59,6 @@ class DashboardController extends Controller
             'servicesChange',
             'bookingsChange',
             'roleDistribution',
-            'usersWithoutRolesCount'
         ));
     }
 }

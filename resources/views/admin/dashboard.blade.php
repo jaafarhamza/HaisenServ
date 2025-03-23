@@ -39,13 +39,6 @@
                 'change' => $usersChange,
             ],
             [
-                'title' => 'Admin Users',
-                'value' => $adminCount,
-                'icon' => 'user-shield',
-                'color' => 'tertiary',
-                'change' => $adminChange ?? 0,
-            ],
-            [
                 'title' => 'Provider Users',
                 'value' => $providerCount,
                 'icon' => 'user-tie',
@@ -58,13 +51,6 @@
                 'icon' => 'user',
                 'color' => 'purple-500',
                 'change' => $clientCount ?? 0,
-            ],
-            [
-                'title' => 'Users Without Roles',
-                'value' => $usersWithoutRolesCount,
-                'icon' => 'user-slash',
-                'color' => 'red-500',
-                'change' => $usersWithoutRolesChange ?? 0,
             ],
         ];
     @endphp

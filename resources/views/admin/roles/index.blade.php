@@ -40,13 +40,7 @@
                 'color' => 'blue-500',
                 'change' => $usersChange,
             ],
-            [
-                'title' => 'Admin Users',
-                'value' => $adminCount,
-                'icon' => 'user-cog',
-                'color' => 'purple-500',
-                'change' => $adminChange,
-            ],
+            
         ];
     @endphp
     
