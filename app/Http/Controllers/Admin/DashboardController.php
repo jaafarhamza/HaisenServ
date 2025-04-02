@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Service;
 use App\Models\Category;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -22,8 +23,9 @@ class DashboardController extends Controller
         $clientCount = User::whereHas('roles', function ($query) {
             $query->where('name', 'client');
         })->count();
-
-        $servicesCount = 87;
+        
+        $servicesCount = Service::count();
+        $categoriesCount = Category::count();
         $bookingsCount = 256;
 
         $usersChange = 12;

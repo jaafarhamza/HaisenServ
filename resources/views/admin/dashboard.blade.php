@@ -52,6 +52,14 @@
                 'color' => 'purple-500',
                 'change' => $clientCount ?? 0,
             ],
+            [
+                'title' => 'Services',
+                'value' => $servicesCount,
+                'icon' => 'concierge-bell',
+                'color' => 'purple-500',
+                'change' => $servicesChange ?? 0,
+            ],
+
         ];
     @endphp
 

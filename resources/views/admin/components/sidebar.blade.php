@@ -41,7 +41,8 @@
         </a>
 
         <!-- Services Icon -->
-        <a href="#" class="sidebar-icon {{ request()->routeIs('admin.services.*') ? 'active-link' : '' }}">
+        <a href="{{ route('admin.services.index') }}"
+            class="sidebar-icon {{ request()->routeIs('admin.services.*') ? 'active-link' : '' }}">
             <i class="fas fa-concierge-bell"></i>
             <span class="sidebar-tooltip group-hover:scale-100">Services</span>
         </a>
