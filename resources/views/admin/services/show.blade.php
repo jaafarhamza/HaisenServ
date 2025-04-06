@@ -52,6 +52,12 @@
                                 <span class="font-medium text-textHeading">{{ $service->formatted_price }}</span>
                             </li>
                             <li class="flex justify-between">
+                                <span class="text-secondary">City:</span>
+                                <span class="font-medium text-textHeading">
+                                    {{ $service->city ?? 'Not specified' }}
+                                </span>
+                            </li>
+                            <li class="flex justify-between">
                                 <span class="text-secondary">Category:</span>
                                 <span class="font-medium text-highlight">
                                     @if($service->category)

@@ -26,6 +26,7 @@ class Service extends Model
         'og_title',
         'og_description',
         'og_image_url',
+        'city',
     ];
 
     protected $casts = [

@@ -32,6 +32,16 @@
                     @endforeach
                 </select>
             </div>
+            <div>
+                <label for="city" class="block text-sm font-medium text-textParagraph mb-1">City</label>
+                <input type="text" name="city" id="city" value="{{ request('city') }}" 
+                    list="city-list" placeholder="Type or select a city" class="input-field w-full">
+                <datalist id="city-list">
+                    @foreach($cities as $city)
+                        <option value="{{ $city }}">
+                    @endforeach
+                </datalist>
+            </div>
 
             <div>
                 <label for="status" class="block text-sm font-medium text-textParagraph mb-1">Status</label>
@@ -44,7 +54,6 @@
                     @endforeach
                 </select>
             </div>
-
             <div class="flex items-end">
                 <button type="submit" class="btn-primary h-10 w-full">
                     <i class="fas fa-search mr-2"></i> Filter
@@ -65,6 +74,7 @@
                     <th scope="col" class="table-header">Category</th>
                     <th scope="col" class="table-header">Provider</th>
                     <th scope="col" class="table-header">Price</th>
+                    <th scope="col" class="table-header">City</th>
                     <th scope="col" class="table-header">Status</th>
                     <th scope="col" class="table-header">Created</th>
                     <th scope="col" class="table-header">Actions</th>
@@ -90,6 +100,9 @@
                             @endif
                         </td>
                         <td class="table-cell">{{ $service->formatted_price }}</td>
+                        <td class="table-cell">
+                            {{ $service->city ?? 'Not specified' }}
+                        </td>
                         <td class="table-cell">
                             <span class="badge {{ $service->status_badge_class }} text-white">
                                 {{ $service->status_label }}

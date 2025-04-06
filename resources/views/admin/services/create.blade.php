@@ -17,7 +17,7 @@
     <div class="p-6">
         <form action="{{ route('admin.services.store') }}" method="POST">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Basic Information -->
                 <div class="space-y-6">
                     <h2 class="text-xl font-bold text-textHeading mb-4">Basic Information</h2>
@@ -46,6 +46,15 @@
                             <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0"
                                 class="input-field w-full @error('price') border-red-500 @enderror" required>
                             @error('price')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="city" class="block text-sm font-medium text-textParagraph mb-1">City</label>
+                            <input type="text" name="city" id="city" value="{{ old('city') }}" 
+                                class="input-field w-full @error('city') border-red-500 @enderror" 
+                                placeholder="Enter city">
+                            @error('city')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>

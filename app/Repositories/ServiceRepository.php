@@ -111,10 +111,15 @@ class ServiceRepository implements ServiceRepositoryInterface
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%");
             });
         }
 
+        // City filter
+        if (isset($filters['city']) && !empty($filters['city'])) {
+            $query->where('city', $filters['city']); 
+        }
         // Category filter
         if (isset($filters['category_id']) && !empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);

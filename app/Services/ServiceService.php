@@ -35,11 +35,11 @@ class ServiceService
     public function createService(array $data): Service
     {
         DB::beginTransaction();
-        
+
         try {
             $service = $this->serviceRepository->createService($data);
             DB::commit();
-            
+
             return $service;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -50,11 +50,11 @@ class ServiceService
     public function updateService(Service $service, array $data): bool
     {
         DB::beginTransaction();
-        
+
         try {
             $result = $this->serviceRepository->updateService($service, $data);
             DB::commit();
-            
+
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -68,13 +68,13 @@ class ServiceService
         if ($service->bookings()->count() > 0) {
             throw new \Exception("Cannot delete service with associated bookings.");
         }
-        
+
         DB::beginTransaction();
-        
+
         try {
             $result = $this->serviceRepository->deleteService($service->id);
             DB::commit();
-            
+
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();

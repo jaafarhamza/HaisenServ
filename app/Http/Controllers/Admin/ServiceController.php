@@ -28,12 +28,19 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'category_id', 'user_id', 'status', 'sort_by', 'sort_order']);
+        $filters = $request->only(['search', 'category_id', 'user_id', 'status', 'sort_by', 'sort_order', 'city']);
         $services = $this->serviceService->getPaginatedServices($filters);
         $categories = $this->serviceService->getAllCategories();
         $statuses = $this->serviceService->getServiceStatuses();
 
-        return view('admin.services.index', compact('services', 'categories', 'statuses', 'filters'));
+        $cities = \App\Models\Service::select('city')
+            ->whereNotNull('city')
+            ->distinct()
+            ->orderBy('city')
+            ->pluck('city')
+            ->toArray();
+
+        return view('admin.services.index', compact('services', 'categories', 'statuses', 'filters', 'cities'));
     }
 
     public function create()
@@ -62,6 +69,7 @@ class ServiceController extends Controller
             'og_title' => 'nullable|string|max:255',
             'og_description' => 'nullable|string',
             'og_image_url' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
         ]);
 
         try {
@@ -114,6 +122,7 @@ class ServiceController extends Controller
             'og_title' => 'nullable|string|max:255',
             'og_description' => 'nullable|string',
             'og_image_url' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
         ]);
 
         try {
