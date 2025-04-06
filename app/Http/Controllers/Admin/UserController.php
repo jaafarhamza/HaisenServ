@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Role;
-use App\Repositories\Interfaces\UserRepositoryInterface;
-use App\Repositories\Interfaces\RoleRepositoryInterface;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use App\Notifications\NewUserCreatedByAdmin;
+use App\Repositories\Interfaces\RoleRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 
 class UserController extends Controller
 {
@@ -74,6 +75,7 @@ class UserController extends Controller
 
         try {
             // Create user
+            $plainPassword = $validated['password'];
             $user = $this->userRepository->createUser([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -89,7 +91,7 @@ class UserController extends Controller
                     }
                 }
             }
-
+            $user->notify(new NewUserCreatedByAdmin($plainPassword));
             DB::commit();
 
             return redirect()->route('admin.users.index')
@@ -152,13 +154,22 @@ class UserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
             ];
+            $passwordChanged = false;
+            $newPassword = null;
 
             // Only update password if provided
             if (!empty($validated['password'])) {
                 $userData['password'] = $validated['password'];
+                $passwordChanged = true;
+                $newPassword = $validated['password'];
             }
 
             $this->userRepository->updateUser($user, $userData);
+            // Check if roles changed
+            $oldRoleIds = $user->roles->pluck('id')->toArray();
+            $newRoleIds = isset($validated['roles']) ? $validated['roles'] : [];
+            $rolesChanged = count(array_diff($oldRoleIds, $newRoleIds)) > 0 ||
+                count(array_diff($newRoleIds, $oldRoleIds)) > 0;
 
             // Sync roles
             if (isset($validated['roles'])) {
@@ -167,6 +178,22 @@ class UserController extends Controller
                 $user->roles()->detach();
             }
 
+            // Get role names for notification
+            $roleNames = [];
+            if (!empty($newRoleIds)) {
+                $roles = $this->roleRepository->getAllRoles()->whereIn('id', $newRoleIds);
+                $roleNames = $roles->pluck('name')->toArray();
+            }
+
+            // Only send notification if password or roles changed
+            if ($passwordChanged || $rolesChanged) {
+                $user->notify(new \App\Notifications\UserUpdatedNotification(
+                    $passwordChanged,
+                    $newPassword,
+                    $rolesChanged,
+                    $roleNames
+                ));
+            }
             DB::commit();
 
             return redirect()->route('admin.users.index')
@@ -268,7 +295,7 @@ class UserController extends Controller
                 $bannedUntil = now()->addDays(30);
                 break;
             case 'permanent':
-                $bannedUntil = now()->setYear(2999); 
+                $bannedUntil = now()->setYear(2999);
                 break;
             default:
                 $bannedUntil = now()->addDay();
