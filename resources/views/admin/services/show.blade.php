@@ -149,6 +149,11 @@
                         <h4 class="text-sm font-medium text-secondary mb-1">Meta Description</h4>
                         <p class="text-textHeading">{{ $service->meta_description ?? 'Not set' }}</p>
                     </div>
+
+                    <div>
+                        <h4 class="text-sm font-medium text-secondary mb-1">City</h4>
+                        <p class="text-textHeading">{{ $service->city }}</p>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>

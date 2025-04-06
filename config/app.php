@@ -176,4 +176,8 @@ return [
         'role' => \App\Http\Middleware\CheckRole::class,
     ])->toArray(),
 
+    'web' => [
+        \App\Http\Middleware\CheckBanned::class,
+    ],
+
 ];

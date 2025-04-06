@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Repositories;
 
 use App\Models\User;
@@ -41,7 +42,7 @@ class UserRepository implements UserRepositoryInterface
         if (isset($data['password']) && $data['password']) {
             $data['password'] = Hash::make($data['password']);
         }
-        
+
         return $this->model->create($data);
     }
 
@@ -50,7 +51,7 @@ class UserRepository implements UserRepositoryInterface
         if (isset($data['password']) && $data['password']) {
             $data['password'] = Hash::make($data['password']);
         }
-        
+
         return $user->update($data);
     }
 
@@ -64,25 +65,25 @@ class UserRepository implements UserRepositoryInterface
         $user = $this->model->where('google_id', $userData['google_id'])
             ->orWhere('email', $userData['email'])
             ->first();
-            
+
         if (!$user) {
             return $this->createUser($userData);
         }
-        
+
         if (!$user->google_id) {
             $this->updateUser($user, [
                 'google_id' => $userData['google_id'],
                 'avatar' => $userData['avatar'] ?? null,
             ]);
         }
-        
+
         return $user;
     }
-    
+
     public function assignRoleToUser(User $user, string $roleName): void
     {
         $role = Role::where('name', $roleName)->first();
-        
+
         if ($role) {
             $user->assignRole($role);
         }
@@ -91,7 +92,7 @@ class UserRepository implements UserRepositoryInterface
     public function removeRoleFromUser(User $user, string $roleName): void
     {
         $role = Role::where('name', $roleName)->first();
-        
+
         if ($role) {
             $user->removeRole($role);
         }
@@ -100,11 +101,11 @@ class UserRepository implements UserRepositoryInterface
     public function getUsersWithRole(string $roleName): Collection
     {
         $role = Role::where('name', $roleName)->first();
-        
+
         if ($role) {
             return $role->users;
         }
-        
+
         return collect();
     }
 
@@ -113,7 +114,23 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->createUser($data);
         $this->assignRoleToUser($user, $roleName);
-        
+
         return $user;
+    }
+
+    public function banUser(User $user, \DateTime $bannedUntil, string $reason = null): bool
+    {
+        return $user->update([
+            'banned_until' => $bannedUntil,
+            'ban_reason' => $reason,
+        ]);
+    }
+
+    public function unbanUser(User $user): bool
+    {
+        return $user->update([
+            'banned_until' => null,
+            'ban_reason' => null,
+        ]);
     }
 }

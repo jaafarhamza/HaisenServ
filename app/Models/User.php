@@ -23,6 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'banned_until',
+        'ban_reason',
     ];
 
     /**
@@ -45,6 +47,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'banned_until' => 'datetime',
         ];
     }
 
@@ -90,5 +93,27 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned_until !== null && $this->banned_until->isFuture();
+    }
+
+    public function getBanStatus(): string
+    {
+        if (!$this->isBanned()) {
+            return 'Active';
+        }
+
+        if ($this->banned_until->isPast()) {
+            return 'Ban Expired';
+        }
+
+        if ($this->banned_until->year === 2999) {
+            return 'Permanently Banned';
+        }
+
+        return 'Banned until ' . $this->banned_until->format('M d, Y');
     }
 }

@@ -15,7 +15,7 @@
             <i class="fas fa-plus mr-2"></i> Add New User
         </a>
     </div>
-    
+
     <!-- Users List -->
     @component('admin.components.card')
         @slot('header')
@@ -26,16 +26,16 @@
             <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <form action="{{ route('admin.users.index') }}" method="GET" class="flex space-x-2">
                     <div class="relative">
-                        <input type="text" name="search" placeholder="Search users..." 
-                               class="input-field" value="{{ request('search') }}">
+                        <input type="text" name="search" placeholder="Search users..." class="input-field"
+                            value="{{ request('search') }}">
                         <button type="submit" class="absolute right-3 top-3 text-secondary">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    
+
                     <select name="role" class="input-field" onchange="this.form.submit()">
                         <option value="">All Roles</option>
-                        @foreach($roles as $role)
+                        @foreach ($roles as $role)
                             <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>
                                 {{ ucfirst($role->name) }}
                             </option>
@@ -46,7 +46,7 @@
         @endslot
 
         @slot('noPadding', true)
-        
+
         @component('admin.components.table')
             @slot('header')
                 <th scope="col" class="table-header">#</th>
@@ -55,16 +55,18 @@
                 <th scope="col" class="table-header">Roles</th>
                 <th scope="col" class="table-header">Created At</th>
                 <th scope="col" class="table-header text-right">Actions</th>
+                <th scope="col" class="table-header">Status</th>
             @endslot
-            
+
             @forelse($users as $user)
                 <tr class="hover:bg-bgPrimary transition-colors duration-150">
                     <td class="table-cell">{{ $loop->iteration }}</td>
                     <td class="table-cell font-medium text-textHeading">
                         <div class="flex items-center">
                             <div class="avatar mr-3">
-                                @if($user->avatar)
-                                    <img src="{{ $user->avatar }}" alt="{{ $user->name }}" class="h-10 w-10 rounded-full object-cover">
+                                @if ($user->avatar)
+                                    <img src="{{ $user->avatar }}" alt="{{ $user->name }}"
+                                        class="h-10 w-10 rounded-full object-cover">
                                 @else
                                     <span>{{ substr($user->name, 0, 2) }}</span>
                                 @endif
@@ -101,14 +103,32 @@
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="btn-primary py-1 px-2" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            @if($user->id !== auth()->id())
-                                <button class="btn-danger py-1 px-2" title="Delete" 
-                                        onclick="showModal('delete-user-modal-{{ $user->id }}')">
+                            @if ($user->id !== auth()->id())
+                                <button class="btn-danger py-1 px-2" title="Delete"
+                                    onclick="showModal('delete-user-modal-{{ $user->id }}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             @endif
                         </div>
                     </td>
+                    <td class="table-cell">
+                        @if($user->isBanned())
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Banned
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Active
+                            </span>
+                        @endif
+                    </td>
+
                 </tr>
             @empty
                 <tr>
@@ -123,26 +143,26 @@
                     </td>
                 </tr>
             @endforelse
-            
+
             @slot('pagination')
                 <p class="text-sm text-secondary">
                     Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} users
                 </p>
-                
+
                 {{ $users->links('admin.components.pagination') }}
             @endslot
         @endcomponent
     @endcomponent
-    
+
     <!-- Delete Confirmation Modals -->
-    @foreach($users as $user)
-        @if($user->id !== auth()->id())
+    @foreach ($users as $user)
+        @if ($user->id !== auth()->id())
             @include('admin.partials.modals.delete-confirmation', [
                 'id' => $user->id,
                 'name' => "user '{$user->name}'",
                 'model' => 'user',
                 'route' => route('admin.users.destroy', $user->id),
-                'warning' => 'This will permanently remove the user and all of their role assignments.'
+                'warning' => 'This will permanently remove the user and all of their role assignments.',
             ])
         @endif
     @endforeach

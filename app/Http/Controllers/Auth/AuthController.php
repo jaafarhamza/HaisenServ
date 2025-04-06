@@ -34,6 +34,18 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+    
+        // Check if user is banned
+        if ($user && $user->isBanned()) {
+            return back()->withErrors([
+                'email' => 'Your account has been banned. Reason: ' . 
+                    ($user->ban_reason ?? 'No reason provided') . 
+                    '. The ban will be lifted on ' . 
+                    ($user->banned_until->year === 2999 ? 'never' : $user->banned_until->format('M d, Y'))
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             

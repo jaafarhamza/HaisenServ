@@ -244,4 +244,53 @@ class UserController extends Controller
         return redirect()->route('admin.profile')
             ->with('success', 'Profile updated successfully');
     }
+
+    public function ban(Request $request, User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->back()
+                ->with('error', 'You cannot ban yourself');
+        }
+
+        $validated = $request->validate([
+            'ban_reason' => 'required|string|max:255',
+            'ban_period' => 'required|string|in:1_day,7_days,30_days,permanent',
+        ]);
+
+        switch ($validated['ban_period']) {
+            case '1_day':
+                $bannedUntil = now()->addDay();
+                break;
+            case '7_days':
+                $bannedUntil = now()->addDays(7);
+                break;
+            case '30_days':
+                $bannedUntil = now()->addDays(30);
+                break;
+            case 'permanent':
+                $bannedUntil = now()->setYear(2999); 
+                break;
+            default:
+                $bannedUntil = now()->addDay();
+        }
+
+        $user->update([
+            'banned_until' => $bannedUntil,
+            'ban_reason' => $validated['ban_reason'],
+        ]);
+
+        return redirect()->route('admin.users.show', $user->id)
+            ->with('success', 'User has been banned successfully');
+    }
+
+    public function unban(User $user)
+    {
+        $user->update([
+            'banned_until' => null,
+            'ban_reason' => null,
+        ]);
+
+        return redirect()->route('admin.users.show', $user->id)
+            ->with('success', 'User has been unbanned successfully');
+    }
 }
