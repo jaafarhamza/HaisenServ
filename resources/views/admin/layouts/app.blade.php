@@ -111,6 +111,7 @@
     @stack('modals')
     
     <!-- Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         // JavaScript for interactive elements
         document.querySelectorAll('.sidebar-icon').forEach(icon => {

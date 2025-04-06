@@ -50,21 +50,24 @@ Route::get('/test-route', function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Roles Management
     Route::resource('roles', RoleController::class);
-    
+
     // Permissions Management
     Route::resource('permissions', PermissionController::class);
-    
+
     Route::post('permissions/{permission}/assign-to-roles', [PermissionController::class, 'assignToRoles'])->name('permissions.assign-to-roles');
 
     Route::resource('users', UserController::class);
-    
+
     Route::resource('categories', CategoryController::class);
-    
+
     Route::resource('services', ServiceController::class);
     Route::post('services/{service}/change-status', [ServiceController::class, 'changeStatus'])->name('services.changeStatus');
-    
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });
