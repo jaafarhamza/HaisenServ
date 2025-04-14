@@ -1,8 +1,10 @@
 <div class="fixed inset-y-0 left-0 w-16 bg-bgSecondary border-r border-secondary flex flex-col items-center py-6 z-10">
     <div class="flex flex-col items-center space-y-4">
         <!-- Logo -->
-        <a href="{{ route('admin.dashboard') }}" class="sidebar-icon text-xl mt-0 bg-buttonPrimary text-white mb-8">
-            <i class="fas fa-bolt"></i>
+        <a href="{{ route('homepage') }}"
+            class="sidebar-icon {{ request()->routeIs('admin.dashboard') ? 'active-link' : '' }}">
+            <i class="fas fa-home"></i>
+            <span class="sidebar-tooltip group-hover:scale-100">Dashboard</span>
         </a>
 
         <!-- Dashboard Icon -->

@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
-class ServiceSeeder extends Seeder
+class ServicesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -71,7 +71,7 @@ class ServiceSeeder extends Seeder
         $serviceTypes = [
             'Cleaning Services' => [
                 'Deep Home Cleaning',
-                'Office Cleaning Service',
+                'Office Cleaggning Service',
                 'Carpet Cleaning',
                 'Move-in/Move-out Cleaning',
                 'Weekly Home Cleaning'

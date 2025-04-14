@@ -49,7 +49,7 @@ class RoleSelectionController extends Controller
         $role = $request->role;
 
         if ($role === 'skip') {
-            $role = 'client';
+            $role === 'client';
         }
 
         $this->userRepository->assignRoleToUser($user, $request->role);

@@ -74,7 +74,7 @@
             @csrf
             <input type="hidden" name="role" value="skip">
             <button type="submit" class="text-highlight hover:text-buttonPrimary transition-colors duration-300">
-                Skip for now (continue as client)
+                Skip
             </button>
         </form>
     </div>
