@@ -46,13 +46,20 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            if (Auth::user()->isAdmin()) {
+            $user = Auth::user();
+            
+            if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');
+            } else if ($user->hasRole('provider')) {
+                return redirect()->route('provider.profile');
+            } else if ($user->hasRole('client')) {
+                return redirect()->route('homepage');
+            } else {
+                return redirect()->route('role.selection');
             }
-            return view("homepage");
         }
 
         return back()->withErrors([

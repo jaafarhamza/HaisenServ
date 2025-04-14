@@ -25,6 +25,10 @@ class User extends Authenticatable
         'avatar',
         'banned_until',
         'ban_reason',
+        'phone',
+        'bio',
+        'city',
+        'profile_completed',
     ];
 
     /**
@@ -48,6 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'banned_until' => 'datetime',
+            'profile_completed' => 'boolean',
         ];
     }
 
@@ -115,5 +120,21 @@ class User extends Authenticatable
         }
 
         return 'Banned until ' . $this->banned_until->format('M d, Y');
+    }
+
+    public function isProvider(): bool
+    {
+        return $this->hasRole('provider');
+    }
+
+    public function isClient(): bool
+    {
+        return $this->hasRole('client');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'user_category')
+            ->select('categories.*');
     }
 }

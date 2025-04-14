@@ -9,16 +9,6 @@
     </div>
 
     <div class="flex items-center space-x-4">
-        <!-- Search -->
-        <div class="relative">
-            <form action="@yield('search-route', route('admin.dashboard'))" method="GET">
-                <input type="text" name="search" placeholder="Search..." value="{{ request('search') }}"
-                    class="input-field w-64">
-                <button type="submit" class="absolute right-3 top-3 text-secondary hover:text-highlight">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
 
         <!-- Notifications -->
         <div class="relative">
