@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
+use App\Models\Rating;
+use App\Models\Booking;
+use App\Models\Category;
+use App\Models\Availability;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Service extends Model
 {
@@ -92,4 +97,26 @@ class Service extends Model
     {
         return $query->where('category_id', $categoryId);
     }
+    public function bookings()
+{
+    return $this->hasMany(Booking::class);
+}
+
+public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
+
+public function availabilities()
+{
+    return $this->hasMany(Availability::class);
+}
+
+public function updateAverageRating()
+{
+    $avgRating = $this->ratings()->avg('score') ?? 0;
+    
+    $this->user->rating_average = $avgRating;
+    $this->user->save();
+}
 }

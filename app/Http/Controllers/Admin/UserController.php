@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Notifications\NewUserCreatedByAdmin;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -258,14 +259,25 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $validated['avatar'] = '/storage/' . $avatarPath;
+            // Delete old avatar if exists
+            if ($user->avatar && !str_contains($user->avatar, 'google')) {
+                // Get the path relative to storage/app/public
+                $oldPath = str_replace('/storage/', '', $user->avatar);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+            
+            // Store the new avatar
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = '/storage/' . $path;
+            
+            // For debugging purposes
+            \Log::info('New avatar path: ' . $validated['avatar']);
         }
-
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        }
-
+    
+        $validated['profile_completed'] = true;
+        
         $this->userRepository->updateUser($user, $validated);
 
         return redirect()->route('admin.profile')

@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\CategoryStatisticsController;
 use Illuminate\Support\Facades\App;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('homepage');
 });
 
 // Homepage route
@@ -49,11 +49,6 @@ Route::middleware('guest')->group(function () {
 Route::get('login/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
 Route::get('login/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-// Test 
-Route::get('/test-route', function () {
-    return 'Test route is working!';
-});
-
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
@@ -74,8 +69,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('services', ServiceController::class);
     Route::post('services/{service}/change-status', [ServiceController::class, 'changeStatus'])->name('services.changeStatus');
 
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
@@ -83,6 +76,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
     Route::post('/users/{user}/unban', [UserController::class, 'unban'])->name('users.unban');
 });
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Role Selection Routes
 Route::middleware(['auth'])->group(function () {

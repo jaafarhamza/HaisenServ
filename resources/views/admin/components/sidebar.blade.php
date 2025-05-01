@@ -75,7 +75,7 @@
             <span class="sidebar-tooltip group-hover:scale-100">Logout</span>
         </a>
 
-        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="hidden">
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
             @csrf
         </form>
     </div>

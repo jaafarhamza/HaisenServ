@@ -91,6 +91,6 @@ class AuthController extends Controller
     {
         $this->authRepository->logout($request);
 
-        return redirect('/welcome');
+        return redirect('/');
     }
 }

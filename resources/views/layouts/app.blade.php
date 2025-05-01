@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -120,31 +121,50 @@
     <!-- Font imports -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     @stack('styles')
-    
+
     <!-- Preload dark mode -->
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-dark dark:via-dark/90 dark:to-dark dark:text-gray-100 font-sans transition-colors duration-300">
+
+<body
+    class="min-h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-dark dark:via-dark/90 dark:to-dark dark:text-gray-100 font-sans transition-colors duration-300">
     <!-- App Header -->
-    <div class="h-20"></div> 
+    <div class="h-20"></div>
     @include('components.header')
-    
+
+    <!-- Hero Section -->
+    @include('components.hero-section')
+
+    <!-- Category Grid Section -->
+    @include('components.category-grid')
+
+    <!-- Category Listing Section -->
+    @include('components.category-listing')
+
+    @include('components.featured-providers')
+
+    @include('components.location-map')
+
     <main class="flex-grow pt-10">
         @yield('content')
     </main>
-    
+
     @include('components.footer')
 
     <!-- Scripts -->
     @stack('scripts')
 </body>
+
 </html>

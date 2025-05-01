@@ -189,7 +189,7 @@
                                     </svg> Settings
                                 </a>
                                 <div class="border-t border-white/10"></div>
-                                <form method="POST" action="{{ route('admin.logout') }}">
+                                <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
                                         class="flex w-full items-center px-4 py-3 text-red-400 hover:bg-red-500/10 transition duration-300">
@@ -345,7 +345,7 @@
                     <span>Settings</span>
                 </a>
                 <div class="pt-2 border-t border-white/10 mt-2">
-                    <form method="POST" action="{{ route('admin.logout') }}">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
                             class="flex w-full items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-red-400 transition-all duration-300">
