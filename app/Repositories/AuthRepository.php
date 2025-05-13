@@ -35,8 +35,6 @@ class AuthRepository implements AuthRepositoryInterface
     {
         $user = $this->userRepository->createUser($userData);
         
-        Auth::login($user);
-        
         return $user;
     }
     

@@ -40,6 +40,23 @@ class GoogleController extends Controller
                 return redirect()->route('login')
                     ->withErrors(['error' => 'Google authentication failed: ' . $request->error]);
             }
+
+            $googleUser = $this->googleAuthRepository->getGoogleUser();
+
+            // Check if the user exists and is banned
+            $existingUser = \App\Models\User::where('email', $googleUser->getEmail())
+                ->orWhere('google_id', $googleUser->getId())
+                ->first();
+                
+            if ($existingUser && $existingUser->isBanned()) {
+                return redirect()->route('login')
+                    ->withErrors([
+                        'email' => 'Your account has been banned. Reason: ' . 
+                            ($existingUser->ban_reason ?? 'No reason provided') . 
+                            '. The ban will be lifted on ' . 
+                            ($existingUser->banned_until->year === 2999 ? 'never' : $existingUser->banned_until->format('M d, Y'))
+                    ]);
+            }
             
             $user = $this->googleAuthRepository->handleGoogleCallback();
             Log::info('Google auth successful', ['user_email' => $user->email ?? 'unknown']);

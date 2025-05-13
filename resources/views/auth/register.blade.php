@@ -46,7 +46,7 @@
                         </svg>
                         <input id="name" name="name" type="text" autocomplete="name" required value="{{ old('name') }}"
                               class="input-field text-sm py-2"
-                              placeholder="John Doe">
+                              placeholder="Your Name">
                     </div>
                 </div>
             </div>

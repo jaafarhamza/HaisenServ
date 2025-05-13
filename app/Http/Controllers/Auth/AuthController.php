@@ -34,9 +34,32 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        if ($this->authRepository->attemptLogin($credentials, $remember)) {
+        $user = User::where('email', $credentials['email'])->first();
+    
+        // Check if user is banned
+        if ($user && $user->isBanned()) {
+            return back()->withErrors([
+                'email' => 'Your account has been banned. Reason: ' . 
+                    ($user->ban_reason ?? 'No reason provided') . 
+                    '. The ban will be lifted on ' . 
+                    ($user->banned_until->year === 2999 ? 'never' : $user->banned_until->format('M d, Y'))
+            ])->onlyInput('email');
+        }
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
+            
+            $user = Auth::user();
+            
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            } else if ($user->hasRole('provider')) {
+                return redirect()->route('provider.profile');
+            } else if ($user->hasRole('client')) {
+                return redirect()->route('homepage');
+            } else {
+                return redirect()->route('role.selection');
+            }
         }
 
         return back()->withErrors([
@@ -61,7 +84,7 @@ class AuthController extends Controller
 
         $this->authRepository->register($userData);
 
-        return redirect(route('dashboard'));
+        return redirect(route('admin.dashboard'));
     }
 
     public function logout(Request $request)

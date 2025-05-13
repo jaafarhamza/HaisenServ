@@ -3,6 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Role;
+use App\Models\Badge;
+use App\Models\Rating;
+use App\Models\Booking;
+use App\Models\Message;
+use App\Models\Category;
+use App\Models\Gamification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +29,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'banned_until',
+        'ban_reason',
+        'phone',
+        'bio',
+        'city',
+        'profile_completed',
     ];
 
     /**
@@ -44,33 +58,128 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'banned_until' => 'datetime',
+            'profile_completed' => 'boolean',
         ];
     }
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_user');
+        return $this->belongsToMany(Role::class);
     }
 
-    public function assignRole(Role $role): void
+    public function hasRole($role): bool
     {
+        if (is_string($role)) {
+            return $this->roles->contains('name', $role);
+        }
+
+        return !! $role->intersect($this->roles)->count();
+    }
+
+    public function hasPermission($permission): bool
+    {
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->contains('name', $permission);
+    }
+
+    public function assignRole($role): void
+    {
+        if (is_string($role)) {
+            $role = Role::whereName($role)->firstOrFail();
+        }
+
         $this->roles()->syncWithoutDetaching($role);
     }
 
-    public function removeRole(Role $role): void
+    public function removeRole($role): void
     {
+        if (is_string($role)) {
+            $role = Role::whereName($role)->firstOrFail();
+        }
+
         $this->roles()->detach($role);
     }
 
-    public function hasRole(string $roleName): bool
+    public function isAdmin(): bool
     {
-        return $this->roles()->where('name', $roleName)->exists();
+        return $this->hasRole('admin');
     }
 
-    public function hasPermission(string $permissionName): bool
+    public function isBanned(): bool
     {
-        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
-            $query->where('name', $permissionName);
-        })->exists();
+        return $this->banned_until !== null && $this->banned_until->isFuture();
     }
+
+    public function getBanStatus(): string
+    {
+        if (!$this->isBanned()) {
+            return 'Active';
+        }
+
+        if ($this->banned_until->isPast()) {
+            return 'Ban Expired';
+        }
+
+        if ($this->banned_until->year === 2999) {
+            return 'Permanently Banned';
+        }
+
+        return 'Banned until ' . $this->banned_until->format('M d, Y');
+    }
+
+    public function isProvider(): bool
+    {
+        return $this->hasRole('provider');
+    }
+
+    public function isClient(): bool
+    {
+        return $this->hasRole('client');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'user_category')
+            ->select('categories.*');
+    }
+
+    public function services()
+{
+    return $this->hasMany(Service::class);
+}
+
+public function bookings()
+{
+    return $this->hasMany(Booking::class);
+}
+
+public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
+
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
+public function receivedMessages()
+{
+    return $this->hasMany(Message::class, 'recipient_id');
+}
+
+public function gamification()
+{
+    return $this->hasOne(Gamification::class);
+}
+
+public function badges()
+{
+    return $this->belongsToMany(Badge::class, 'badge_user')
+        ->withTimestamps()
+        ->withPivot('earned_date');
+}
+
 }
