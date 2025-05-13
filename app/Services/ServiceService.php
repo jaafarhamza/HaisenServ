@@ -103,4 +103,9 @@ class ServiceService
             'rejected' => 'Rejected'
         ];
     }
+
+    public function getServicesByUser(int $userId): \Illuminate\Support\Collection
+    {
+        return $this->serviceRepository->getServicesByUser($userId);
+    }
 }

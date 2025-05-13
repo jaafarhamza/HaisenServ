@@ -1,12 +1,12 @@
 @extends('provider.layouts.app')
 
-@section('title', 'Create New Service')
+@section('title', 'Edit Service')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Service</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Service</h1>
             <a href="{{ route('provider.services.index') }}" class="flex items-center text-primary hover:text-primary-light transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Services
             </a>
@@ -20,12 +20,13 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <div class="p-6">
-                <form action="{{ route('provider.services.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('provider.services.update', $service->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @method('PUT')
                     
                     <div class="mb-6">
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Title</label>
-                        <input type="text" id="title" name="title" value="{{ old('title') }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                        <input type="text" id="title" name="title" value="{{ old('title', $service->title) }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
                         @error('title')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -36,7 +37,7 @@
                         <select id="category_id" name="category_id" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
                             <option value="">-- Select Category --</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id || in_array($category->id, $userCategories ?? []) ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" {{ old('category_id', $service->category_id) == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
@@ -48,7 +49,7 @@
                     
                     <div class="mb-6">
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
-                        <textarea id="description" name="description" rows="5" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>{{ old('description') }}</textarea>
+                        <textarea id="description" name="description" rows="5" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>{{ old('description', $service->description) }}</textarea>
                         @error('description')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -56,7 +57,7 @@
                     
                     <div class="mb-6">
                         <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price ($)</label>
-                        <input type="number" id="price" name="price" value="{{ old('price') }}" min="0" step="0.01" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                        <input type="number" id="price" name="price" value="{{ old('price', $service->price) }}" min="0" step="0.01" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
                         @error('price')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -64,7 +65,7 @@
                     
                     <div class="mb-6">
                         <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Location (City)</label>
-                        <input type="text" id="city" name="city" value="{{ old('city', Auth::user()->city) }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <input type="text" id="city" name="city" value="{{ old('city', $service->city) }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                         @error('city')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -73,8 +74,16 @@
                     <div class="mb-6">
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                         <select id="status" name="status" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Save as Draft</option>
-                            <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Submit for Approval</option>
+                            <option value="draft" {{ old('status', $service->status) == 'draft' ? 'selected' : '' }}>Draft</option>
+                            <option value="pending" {{ old('status', $service->status) == 'pending' ? 'selected' : '' }}>Submit for Approval</option>
+                            @if($service->status == 'active')
+                                <option value="active" {{ old('status', $service->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ old('status', $service->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            @endif
+                            @if($service->status == 'inactive')
+                                <option value="active" {{ old('status', $service->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ old('status', $service->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            @endif
                         </select>
                         @error('status')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -105,11 +114,30 @@
                         @enderror
                     </div>
                     
+                    <!-- Current Images Preview -->
+                    @if($service->images && count($service->images) > 0)
+                        <div class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Images</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                @foreach($service->images as $image)
+                                    <div class="relative group">
+                                        <img src="{{ asset('storage/' . $image->path) }}" alt="{{ $service->title }}" class="h-24 w-full object-cover rounded-lg">
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                            <button type="button" class="text-white hover:text-red-300" onclick="removeImage({{ $image->id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 border-t border-gray-200 dark:border-gray-700 pt-6">SEO Information (Optional)</h3>
                     
                     <div class="mb-6">
                         <label for="meta_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Meta Title</label>
-                        <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title') }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title', $service->meta_title) }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                         @error('meta_title')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -117,7 +145,7 @@
                     
                     <div class="mb-6">
                         <label for="meta_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Meta Description</label>
-                        <textarea id="meta_description" name="meta_description" rows="2" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">{{ old('meta_description') }}</textarea>
+                        <textarea id="meta_description" name="meta_description" rows="2" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">{{ old('meta_description', $service->meta_description) }}</textarea>
                         @error('meta_description')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -125,7 +153,7 @@
                     
                     <div class="mb-6">
                         <label for="meta_keywords" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Meta Keywords (comma separated)</label>
-                        <input type="text" id="meta_keywords" name="meta_keywords" value="{{ old('meta_keywords') }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <input type="text" id="meta_keywords" name="meta_keywords" value="{{ old('meta_keywords', $service->meta_keywords) }}" class="w-full px-4 py-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                         @error('meta_keywords')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -136,12 +164,35 @@
                             Cancel
                         </a>
                         <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-all">
-                            Create Service
+                            Update Service
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Remove Image Modal -->
+<div id="remove-image-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Remove Image</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to remove this image? This action cannot be undone.</p>
+        
+        <form id="remove-image-form" action="{{ route('provider.services.remove-image', $service->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" id="image_id" name="image_id" value="">
+            
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-remove-image" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-opacity-90 transition-all">
+                    Remove
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
@@ -180,6 +231,27 @@
                     
                     reader.readAsDataURL(file);
                 });
+            }
+        });
+        
+        // Remove image functionality
+        const removeImageModal = document.getElementById('remove-image-modal');
+        const cancelRemoveImageButton = document.getElementById('cancel-remove-image');
+        const removeImageForm = document.getElementById('remove-image-form');
+        const imageIdInput = document.getElementById('image_id');
+        
+        window.removeImage = function(imageId) {
+            imageIdInput.value = imageId;
+            removeImageModal.classList.remove('hidden');
+        };
+        
+        cancelRemoveImageButton.addEventListener('click', function() {
+            removeImageModal.classList.add('hidden');
+        });
+        
+        removeImageModal.addEventListener('click', function(e) {
+            if (e.target === removeImageModal) {
+                removeImageModal.classList.add('hidden');
             }
         });
     });
