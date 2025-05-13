@@ -2,13 +2,7 @@
 
 namespace App\Providers;
 
-use App\Repositories\UserRepository;
-use App\Repositories\ServiceRepository;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\CategoryRepository;
-use App\Repositories\Interfaces\UserRepositoryInterface;
-use App\Repositories\Interfaces\ServiceRepositoryInterface;
-use App\Repositories\Interfaces\CategoryRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -17,9 +11,61 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
-        $this->app->bind(ServiceRepositoryInterface::class, ServiceRepository::class);
+        // Register Repositories
+        $this->app->bind(
+            \App\Repositories\Interfaces\UserRepositoryInterface::class,
+            \App\Repositories\UserRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\RoleRepositoryInterface::class,
+            \App\Repositories\RoleRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\PermissionRepositoryInterface::class,
+            \App\Repositories\PermissionRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\CategoryRepositoryInterface::class,
+            \App\Repositories\CategoryRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\ServiceRepositoryInterface::class,
+            \App\Repositories\ServiceRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\BookingRepositoryInterface::class,
+            \App\Repositories\BookingRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\RatingRepositoryInterface::class,
+            \App\Repositories\RatingRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\MessageRepositoryInterface::class,
+            \App\Repositories\MessageRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\BadgeRepositoryInterface::class,
+            \App\Repositories\BadgeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\GamificationRepositoryInterface::class,
+            \App\Repositories\GamificationRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\AvailabilityRepositoryInterface::class,
+            \App\Repositories\AvailabilityRepository::class
+        );
     }
 
     /**
