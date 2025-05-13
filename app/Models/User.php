@@ -145,7 +145,12 @@ class User extends Authenticatable
             ->select('categories.*');
     }
 
-    public function bookings()
+    public function services()
+{
+    return $this->hasMany(Service::class);
+}
+
+public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
@@ -176,4 +181,5 @@ public function badges()
         ->withTimestamps()
         ->withPivot('earned_date');
 }
+
 }

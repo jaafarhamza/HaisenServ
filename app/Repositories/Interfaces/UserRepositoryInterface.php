@@ -19,5 +19,6 @@ interface UserRepositoryInterface
     public function assignRoleToUser(User $user, string $roleName): void;
     public function removeRoleFromUser(User $user, string $roleName): void;
     public function getUsersWithRole(string $roleName): Collection;
+    public function getUsersByRole(string $roleName): Collection;
     public function createUserWithRole(array $data, string $roleName): User;
 }

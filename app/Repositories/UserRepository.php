@@ -108,6 +108,13 @@ class UserRepository implements UserRepositoryInterface
 
         return collect();
     }
+    
+    public function getUsersByRole(string $roleName): Collection
+    {
+        return $this->model->whereHas('roles', function($query) use ($roleName) {
+            $query->where('name', $roleName);
+        })->get();
+    }
 
     // create a user with a specific role
     public function createUserWithRole(array $data, string $roleName): User
