@@ -170,7 +170,7 @@
                                         </svg> Dashboard
                                     </a>
                                 @endif
-                                <a href="#"
+                                <a href="{{ route('profile.index') }}"
                                     class="flex items-center px-4 py-3 hover:bg-white/5 transition duration-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-3"
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -324,7 +324,7 @@
                         <span>Dashboard</span>
                     </a>
                 @endif
-                <a href="#"
+                <a href="{{ route('profile.index') }}"
                     class="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-white/5 text-white transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">

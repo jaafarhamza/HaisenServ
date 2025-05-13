@@ -63,524 +63,192 @@
         <!-- Carousel container with overflow -->
         <div class="relative overflow-hidden">
             <div id="carousel-slider" class="flex transition-transform duration-500 ease-out space-x-2">
-                <!-- Provider Card 1 -->
-                <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                    <div
-                        class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary/10 h-full">
-                        <!-- Provider header with photo -->
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
-                            <img src="https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
-                                class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                                alt="Provider">
-
-                            <!-- Verification Badge -->
+                @if(isset($providers) && $providers->count() > 0)
+                    @foreach($providers as $index => $provider)
+                        @php
+                            // Color themes based on index
+                            $colorTheme = match($index % 4) {
+                                0 => 'primary',
+                                1 => 'secondary',
+                                2 => 'accent',
+                                3 => 'support'
+                            };
+                            
+                            // Default images
+                            $backgroundImages = [
+                                'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+                                'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+                                'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+                            ];
+                            
+                            $profileImages = [
+                                'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+                                'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+                                'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+                            ];
+                            
+                            $backgroundImage = $backgroundImages[$index % count($backgroundImages)];
+                            $profileImage = $provider->avatar ?? $profileImages[$index % count($profileImages)];
+                            
+                            // Get rating average or default to a random value between 4.5 and 5
+                            $ratingAverage = $provider->rating_average ?? number_format(rand(45, 50) / 10, 1);
+                            
+                            // Get provider role display name (convert from database role to display role)
+                            $roleDisplay = "Service Provider";
+                            if ($provider->roles && $provider->roles->count() > 0) {
+                                $role = $provider->roles->first();
+                                $roleDisplay = ucfirst($role->name);
+                                
+                                // Check for specific specializations
+                                if ($provider->categories && $provider->categories->count() > 0) {
+                                    $category = $provider->categories->first();
+                                    $roleDisplay = $category->name . ' Specialist';
+                                }
+                            }
+                            
+                            // Get completed project count
+                            $completedProjects = App\Models\Booking::where('user_id', $provider->id)
+                                ->where('status', 'completed')
+                                ->count();
+                                
+                            // Get provider services
+                            $services = App\Models\Service::where('user_id', $provider->id)
+                                ->where('status', 'active')
+                                ->get();
+                                
+                            // Get provider categories/skills
+                            $skills = [];
+                            if ($provider->categories) {
+                                foreach ($provider->categories as $category) {
+                                    $skills[] = $category->name;
+                                }
+                            } else if ($services && $services->count() > 0) {
+                                foreach ($services as $service) {
+                                    if ($service->category) {
+                                        $skills[] = $service->category->name;
+                                    }
+                                }
+                            }
+                            $skills = array_unique($skills);
+                            
+                            // Response time (random for now)
+                            $responseTime = rand(1, 6);
+                        @endphp
+                        <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
                             <div
-                                class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                                class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-{{ $colorTheme }}/10 h-full">
+                                <!-- Provider header with photo -->
+                                <div class="relative">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
+                                    <img src="{{ $backgroundImage }}"
+                                        class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                                        alt="Provider">
 
-                            <!-- Provider profile picture -->
-                            <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
-                                <div class="rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
-                                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80"
-                                        class="w-16 h-16 rounded-full object-cover border-2 border-dark"
-                                        alt="Sarah Johnson">
+                                    <!-- Verification Badge -->
+                                    <div
+                                        class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 20 20"
+                                            fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+
+                                    <!-- Provider profile picture -->
+                                    <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
+                                        <div class="rounded-full p-1 bg-gradient-to-r from-{{ $colorTheme }} to-{{ match(($index+1) % 4) {
+                                            0 => 'primary',
+                                            1 => 'secondary',
+                                            2 => 'accent',
+                                            3 => 'support'
+                                        } }}">
+                                            <img src="{{ $profileImage }}"
+                                                class="w-16 h-16 rounded-full object-cover border-2 border-dark"
+                                                alt="{{ $provider->name }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Provider info -->
+                                <div class="pt-10 px-6 pb-6">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3
+                                                class="text-xl font-bold text-white group-hover:text-{{ $colorTheme }} transition-colors duration-300">
+                                                {{ $provider->name }}</h3>
+                                            <p class="text-gray-400 text-sm">{{ $roleDisplay }}</p>
+                                        </div>
+                                        <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
+                                                viewBox="0 0 20 20" fill="currentColor">
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                            <span class="text-white ml-1 text-sm font-medium">{{ $ratingAverage }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Service details -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center mb-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-{{ $colorTheme }} mr-2"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                            </svg>
+                                            <span class="text-gray-300 text-sm">{{ $completedProjects }} Projects Completed</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-{{ match(($index+1) % 4) {
+                                                0 => 'primary',
+                                                1 => 'secondary',
+                                                2 => 'accent',
+                                                3 => 'support'
+                                            } }} mr-2"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span class="text-gray-300 text-sm">Usually responds within {{ $responseTime }} hours</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tags -->
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        @if(count($skills) > 0)
+                                            @foreach(array_slice($skills, 0, 3) as $index => $skill)
+                                                <span class="px-3 py-1 bg-{{ $index === 0 ? $colorTheme . '/10 text-' . $colorTheme : 'white/5 text-gray-300' }} text-xs rounded-full">{{ $skill }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="px-3 py-1 bg-{{ $colorTheme }}/10 text-{{ $colorTheme }} text-xs rounded-full">Professional Service</span>
+                                            <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Expert</span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Action Button -->
+                                    <div class="mt-5">
+                                        <a href="#"
+                                            class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-{{ $colorTheme }} to-{{ match(($index+1) % 4) {
+                                                0 => 'primary',
+                                                1 => 'secondary',
+                                                2 => 'accent',
+                                                3 => 'support'
+                                            } }} text-white font-medium hover:shadow-lg hover:shadow-{{ $colorTheme }}/20 transition-all duration-300 transform hover:-translate-y-1">
+                                            View Profile
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Provider info -->
-                        <div class="pt-10 px-6 pb-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3
-                                        class="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
-                                        Sarah Johnson</h3>
-                                    <p class="text-gray-400 text-sm">UX/UI Designer</p>
-                                </div>
-                                <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                        viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span class="text-white ml-1 text-sm font-medium">4.9</span>
-                                </div>
-                            </div>
-
-                            <!-- Service details -->
-                            <div class="mb-4">
-                                <div class="flex items-center mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">78 Projects Completed</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-support mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">Usually responds within 4 hours</span>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="px-3 py-1 bg-accent/10 text-accent text-xs rounded-full">Interior
-                                    Design</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Home Decor</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Space
-                                    Planning</span>
-                            </div>
-
-                            <!-- Testimonial -->
-                            <div class="bg-white/5 rounded-lg p-3 border border-white/10 relative">
-                                <div class="absolute -top-2 left-3 text-accent text-2xl">"</div>
-                                <p class="text-gray-300 text-sm italic mt-1">Emily redesigned our entire office space
-                                    and the result was incredible. She understood our brand and translated it into our
-                                    environment.</p>
-                                <div class="flex items-center mt-2">
-                                    <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80"
-                                        class="w-6 h-6 rounded-full mr-2" alt="Client">
-                                    <p class="text-xs text-gray-400">Alex R., Director at CreativeSpace</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-5">
-                                <a href="#"
-                                    class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-accent to-support text-white font-medium hover:shadow-lg hover:shadow-accent/20 transition-all duration-300 transform hover:-translate-y-1">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
+                    @endforeach
+                @else
+                    <!-- Fallback for when no providers are available -->
+                    <div class="w-full p-8 text-center">
+                        <h3 class="text-2xl font-bold text-white">No service providers available</h3>
+                        <p class="text-gray-400 mt-2">Check back soon for new service providers!</p>
                     </div>
-                </div>
-
-                <!-- Provider Card 2 -->
-                <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                    <div
-                        class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-secondary/10 h-full">
-                        <!-- Provider header with photo -->
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
-                            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
-                                class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                                alt="Provider">
-
-                            <!-- Verification Badge -->
-                            <div
-                                class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <!-- Provider profile picture -->
-                            <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
-                                <div class="rounded-full p-1 bg-gradient-to-r from-secondary to-accent">
-                                    <img src="https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80"
-                                        class="w-16 h-16 rounded-full object-cover border-2 border-dark"
-                                        alt="David Rodriguez">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Provider info -->
-                        <div class="pt-10 px-6 pb-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3
-                                        class="text-xl font-bold text-white group-hover:text-secondary transition-colors duration-300">
-                                        David Rodriguez</h3>
-                                    <p class="text-gray-400 text-sm">Full-Stack Developer</p>
-                                </div>
-                                <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                        viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span class="text-white ml-1 text-sm font-medium">4.8</span>
-                                </div>
-                            </div>
-
-                            <!-- Service details -->
-                            <div class="mb-4">
-                                <div class="flex items-center mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">93 Projects Completed</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">Usually responds within 3 hours</span>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span
-                                    class="px-3 py-1 bg-secondary/10 text-secondary text-xs rounded-full">React</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Node.js</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">MongoDB</span>
-                            </div>
-
-                            <!-- Testimonial -->
-                            <div class="bg-white/5 rounded-lg p-3 border border-white/10 relative">
-                                <div class="absolute -top-2 left-3 text-secondary text-2xl">"</div>
-                                <p class="text-gray-300 text-sm italic mt-1">David built our e-commerce platform from
-                                    scratch and delivered it ahead of schedule. His technical expertise is outstanding!
-                                </p>
-                                <div class="flex items-center mt-2">
-                                    <img src="https://images.unsplash.com/photo-1541823709867-1b206113eafd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80"
-                                        class="w-6 h-6 rounded-full mr-2" alt="Client">
-                                    <p class="text-xs text-gray-400">Jennifer L., Founder of StyleMarket</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-5">
-                                <a href="#"
-                                    class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-secondary to-accent text-white font-medium hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300 transform hover:-translate-y-1">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Provider Card 4 -->
-                <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                    <div
-                        class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-support/10 h-full">
-                        <!-- Provider header with photo -->
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
-                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
-                                class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                                alt="Provider">
-
-                            <!-- Verification Badge -->
-                            <div
-                                class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <!-- Provider profile picture -->
-                            <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
-                                <div class="rounded-full p-1 bg-gradient-to-r from-support to-primary">
-                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80"
-                                        class="w-16 h-16 rounded-full object-cover border-2 border-dark"
-                                        alt="James Wilson">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Provider info -->
-                        <div class="pt-10 px-6 pb-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3
-                                        class="text-xl font-bold text-white group-hover:text-support transition-colors duration-300">
-                                        James Wilson</h3>
-                                    <p class="text-gray-400 text-sm">Marketing Consultant</p>
-                                </div>
-                                <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                        viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span class="text-white ml-1 text-sm font-medium">4.7</span>
-                                </div>
-                            </div>
-
-                            <!-- Service details -->
-                            <div class="mb-4">
-                                <div class="flex items-center mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-support mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">105 Projects Completed</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">Usually responds within 2 hours</span>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="px-3 py-1 bg-support/10 text-support text-xs rounded-full">Digital
-                                    Marketing</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">SEO</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Social
-                                    Media</span>
-                            </div>
-
-                            <!-- Testimonial -->
-                            <div class="bg-white/5 rounded-lg p-3 border border-white/10 relative">
-                                <div class="absolute -top-2 left-3 text-support text-2xl">"</div>
-                                <p class="text-gray-300 text-sm italic mt-1">James helped us increase our online
-                                    traffic by 230% in just three months. His strategic approach to marketing was
-                                    exactly what we needed.</p>
-                                <div class="flex items-center mt-2">
-                                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80"
-                                        class="w-6 h-6 rounded-full mr-2" alt="Client">
-                                    <p class="text-xs text-gray-400">Robert K., Owner of FitLife</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-5">
-                                <a href="#"
-                                    class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-support to-primary text-white font-medium hover:shadow-lg hover:shadow-support/20 transition-all duration-300 transform hover:-translate-y-1">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Provider Card 1 -->
-                <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                    <div
-                        class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary/10 h-full">
-                        <!-- Provider header with photo -->
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
-                            <img src="https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
-                                class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                                alt="Provider">
-
-                            <!-- Verification Badge -->
-                            <div
-                                class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <!-- Provider profile picture -->
-                            <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
-                                <div class="rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
-                                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80"
-                                        class="w-16 h-16 rounded-full object-cover border-2 border-dark"
-                                        alt="Sarah Johnson">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Provider info -->
-                        <div class="pt-10 px-6 pb-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3
-                                        class="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
-                                        Sarah Johnson</h3>
-                                    <p class="text-gray-400 text-sm">UX/UI Designer</p>
-                                </div>
-                                <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                        viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span class="text-white ml-1 text-sm font-medium">4.9</span>
-                                </div>
-                            </div>
-
-                            <!-- Service details -->
-                            <div class="mb-4">
-                                <div class="flex items-center mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">78 Projects Completed</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-support mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">Usually responds within 4 hours</span>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="px-3 py-1 bg-accent/10 text-accent text-xs rounded-full">Interior
-                                    Design</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Home Decor</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Space
-                                    Planning</span>
-                            </div>
-
-                            <!-- Testimonial -->
-                            <div class="bg-white/5 rounded-lg p-3 border border-white/10 relative">
-                                <div class="absolute -top-2 left-3 text-accent text-2xl">"</div>
-                                <p class="text-gray-300 text-sm italic mt-1">Emily redesigned our entire office space
-                                    and the result was incredible. She understood our brand and translated it into our
-                                    environment.</p>
-                                <div class="flex items-center mt-2">
-                                    <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80"
-                                        class="w-6 h-6 rounded-full mr-2" alt="Client">
-                                    <p class="text-xs text-gray-400">Alex R., Director at CreativeSpace</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-5">
-                                <a href="#"
-                                    class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-accent to-support text-white font-medium hover:shadow-lg hover:shadow-accent/20 transition-all duration-300 transform hover:-translate-y-1">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Provider Card 4 -->
-                <div class="provider-card flex-none w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                    <div
-                        class="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-support/10 h-full">
-                        <!-- Provider header with photo -->
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark to-transparent z-10"></div>
-                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
-                                class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                                alt="Provider">
-
-                            <!-- Verification Badge -->
-                            <div
-                                class="absolute top-3 right-3 z-20 bg-primary/20 backdrop-blur-md rounded-full p-1 border border-primary/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <!-- Provider profile picture -->
-                            <div class="absolute bottom-0 left-6 transform translate-y-1/2 z-20">
-                                <div class="rounded-full p-1 bg-gradient-to-r from-support to-primary">
-                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80"
-                                        class="w-16 h-16 rounded-full object-cover border-2 border-dark"
-                                        alt="James Wilson">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Provider info -->
-                        <div class="pt-10 px-6 pb-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3
-                                        class="text-xl font-bold text-white group-hover:text-support transition-colors duration-300">
-                                        James Wilson</h3>
-                                    <p class="text-gray-400 text-sm">Marketing Consultant</p>
-                                </div>
-                                <div class="flex items-center bg-white/5 rounded-lg px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                        viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span class="text-white ml-1 text-sm font-medium">4.7</span>
-                                </div>
-                            </div>
-
-                            <!-- Service details -->
-                            <div class="mb-4">
-                                <div class="flex items-center mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-support mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">105 Projects Completed</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-gray-300 text-sm">Usually responds within 2 hours</span>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="px-3 py-1 bg-support/10 text-support text-xs rounded-full">Digital
-                                    Marketing</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">SEO</span>
-                                <span class="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full">Social
-                                    Media</span>
-                            </div>
-
-                            <!-- Testimonial -->
-                            <div class="bg-white/5 rounded-lg p-3 border border-white/10 relative">
-                                <div class="absolute -top-2 left-3 text-support text-2xl">"</div>
-                                <p class="text-gray-300 text-sm italic mt-1">James helped us increase our online
-                                    traffic by 230% in just three months. His strategic approach to marketing was
-                                    exactly what we needed.</p>
-                                <div class="flex items-center mt-2">
-                                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80"
-                                        class="w-6 h-6 rounded-full mr-2" alt="Client">
-                                    <p class="text-xs text-gray-400">Robert K., Owner of FitLife</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-5">
-                                <a href="#"
-                                    class="block text-center py-2.5 rounded-lg bg-gradient-to-r from-support to-primary text-white font-medium hover:shadow-lg hover:shadow-support/20 transition-all duration-300 transform hover:-translate-y-1">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
 
             <!-- Navigation dots -->

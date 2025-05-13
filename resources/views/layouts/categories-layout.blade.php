@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'HaisenServ') }} - @yield('title', 'Home')</title>
+    <title>{{ config('app.name', 'HaisenServ') }} - @yield('title', 'Categories')</title>
 
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -143,22 +143,6 @@
     <!-- App Header -->
     <div class="h-20"></div>
     @include('components.header')
-
-    <!-- Only include these components on homepage -->
-    @if(request()->routeIs('home') || request()->routeIs('homepage'))
-        <!-- Hero Section -->
-        @include('components.hero-section')
-
-        <!-- Category Explore Section -->
-        @include('components.category-explore')
-
-        <!-- Service Showcase Section -->
-        @include('components.service-showcase')
-
-        @include('components.featured-providers')
-
-        @include('components.location-map')
-    @endif
 
     <main class="flex-grow pt-10">
         @yield('content')

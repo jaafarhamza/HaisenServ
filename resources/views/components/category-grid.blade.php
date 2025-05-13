@@ -21,139 +21,78 @@
 
         <!-- Creative Masonry Grid Layout -->
         <div class="category-grid grid grid-cols-1 md:grid-cols-6 gap-6 mb-10">
-            <!-- Category 1 - Large card (spans 2 rows and 3 cols) -->
-            <div class="md:col-span-3 md:row-span-2 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
+            @if(isset($featuredCategories) && $featuredCategories->count() > 0)
+                @foreach($featuredCategories as $index => $category)
+                    @php
+                        // Define grid classes based on index
+                        $gridClasses = match($index) {
+                            0 => 'md:col-span-3 md:row-span-2',
+                            1 => 'md:col-span-3',
+                            default => 'md:col-span-2'
+                        };
+                        
+                        // Define color themes based on index
+                        $colorTheme = match($index % 4) {
+                            0 => 'primary',
+                            1 => 'secondary',
+                            2 => 'accent',
+                            3 => 'support'
+                        };
+                        
+                        // Get service count for this category
+                        $serviceCount = App\Models\Service::where('category_id', $category->id)
+                            ->where('status', 'active')
+                            ->count();
+                            
+                        // Default placeholder images if icon_url is empty
+                        $backgroundImages = [
+                            'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1531973576160-7125cd663d86?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1587527901949-ab0341697c1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1560439514-4e9645039924?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                        ];
+                        $backgroundImage = $category->icon_url ?? $backgroundImages[$index % count($backgroundImages)];
+                    @endphp
                     
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Technology">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-8 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-sm font-medium mb-3">52 Services</span>
-                        <h3 class="text-3xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Technology</h3>
-                        <p class="text-gray-300 mb-4 max-w-md transition-transform duration-300 group-hover:translate-x-2">Tech support, web development, application management and digital transformation services.</p>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Web Dev</span>
-                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">IT Support</span>
-                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">App Development</span>
+                    <div class="{{ $gridClasses }} group category-card">
+                        <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
+                            
+                            <!-- Background Image -->
+                            <img src="{{ $backgroundImage }}" 
+                                 class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="{{ $category->name }}">
+                            
+                            <!-- Content -->
+                            <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
+                                <span class="inline-block px-4 py-1 rounded-full bg-{{ $colorTheme }}/20 backdrop-blur-sm text-{{ $colorTheme }} text-sm font-medium mb-3">{{ $serviceCount }} Services</span>
+                                <h3 class="text-2xl md:text-3xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">{{ $category->name }}</h3>
+                                @if($index === 0 || $index === 1 || $index === 5)
+                                    <p class="text-gray-300 mb-4 max-w-md transition-transform duration-300 group-hover:translate-x-2">{{ \Illuminate\Support\Str::limit($category->description, 100) }}</p>
+                                @endif
+                                
+                                @if($index === 0 && isset($category->subcategories) && $category->subcategories->count() > 0)
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($category->subcategories->take(3) as $subcategory)
+                                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">{{ $subcategory->name }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Shine effect -->
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
                         </div>
                     </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
+                @endforeach
+            @else
+                <!-- Fallback for when no categories are available -->
+                <div class="md:col-span-6 p-8 text-center">
+                    <h3 class="text-2xl font-bold text-white">No categories available</h3>
+                    <p class="text-gray-400 mt-2">Check back soon for new service categories!</p>
                 </div>
-            </div>
-
-            <!-- Category 2 - Normal card -->
-            <div class="md:col-span-3 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
-                    
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Home Services">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-secondary/20 backdrop-blur-sm text-secondary text-sm font-medium mb-3">68 Services</span>
-                        <h3 class="text-2xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Home Services</h3>
-                        <p class="text-gray-300 mb-4 transition-transform duration-300 group-hover:translate-x-2">Home cleaning, maintenance, repair, and improvement services.</p>
-                    </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
-                </div>
-            </div>
-
-            <!-- Category 3 - Small card -->
-            <div class="md:col-span-2 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
-                    
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1531973576160-7125cd663d86?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Education">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-accent/20 backdrop-blur-sm text-accent text-sm font-medium mb-3">45 Services</span>
-                        <h3 class="text-xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Education</h3>
-                    </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
-                </div>
-            </div>
-
-            <!-- Category 4 - Small card -->
-            <div class="md:col-span-2 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
-                    
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1531973576160-7125cd663d86?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Health & Wellness">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-support/20 backdrop-blur-sm text-support text-sm font-medium mb-3">39 Services</span>
-                        <h3 class="text-xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Health & Wellness</h3>
-                    </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
-                </div>
-            </div>
-
-            <!-- Category 5 - Small card -->
-            <div class="md:col-span-2 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
-                    
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1587527901949-ab0341697c1e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Business">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-sm font-medium mb-3">75 Services</span>
-                        <h3 class="text-xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Business</h3>
-                    </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
-                </div>
-            </div>
-
-            <!-- Category 6 - Wide card -->
-            <div class="md:col-span-4 group category-card">
-                <div class="h-full relative overflow-hidden rounded-2xl transition-all duration-500 transform group-hover:scale-[0.98]">
-                    <!-- Overlay gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark/90 z-10"></div>
-                    
-                    <!-- Background Image -->
-                    <img src="https://images.unsplash.com/photo-1560439514-4e9645039924?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="absolute w-full h-full object-cover transition-all duration-700 group-hover:scale-110" alt="Events & Entertainment">
-                    
-                    <!-- Content -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        <span class="inline-block px-4 py-1 rounded-full bg-secondary/20 backdrop-blur-sm text-secondary text-sm font-medium mb-3">56 Services</span>
-                        <h3 class="text-2xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-2">Events & Entertainment</h3>
-                        <p class="text-gray-300 mb-4 max-w-md transition-transform duration-300 group-hover:translate-x-2">Event planning, entertainment booking, and production services.</p>
-                    </div>
-                    
-                    <!-- Shine effect -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 z-10 transition-opacity duration-700 bg-gradient-to-tr from-white via-white to-transparent bg-[length:200%_200%] bg-[position:0%_0%] group-hover:bg-[position:100%_100%]"></div>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
 </section>

@@ -14,8 +14,8 @@
     <div class="container mx-auto px-6 relative z-10">
         <!-- Section header -->
         <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold mb-4">More Service <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Categories</span></h2>
-            <p class="text-gray-400 max-w-2xl mx-auto">Browse through our comprehensive range of service categories, each offering specialized solutions to meet your specific requirements.</p>
+            <h2 class="text-3xl font-bold mb-4">Explore Our <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Services</span></h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">Browse through our comprehensive range of service categories. Each category shows the number of available services.</p>
         </div>
 
         <!-- Category Pills Row -->
@@ -29,178 +29,131 @@
 
         <!-- Category Cards Grid (3 columns on desktop) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Category 1 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Professional Services">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-xs">42 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Professional Services</h3>
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
+            @if(isset($categories) && $categories->count() > 0)
+                @php
+                    // Filter categories with at least one service
+                    $filteredCategories = $categories->filter(function($category) {
+                        $count = \App\Models\Service::where('category_id', $category->id)
+                            ->where('status', 'active')
+                            ->count();
+                        return $count > 0;
+                    })->take(6);
+                @endphp
+                @foreach($filteredCategories as $index => $category)
+                    @php
+                        // Color themes based on index
+                        $colorTheme = match($index % 4) {
+                            0 => 'primary',
+                            1 => 'secondary',
+                            2 => 'accent',
+                            3 => 'support'
+                        };
+                        
+                        // Get service count for this category
+                        $serviceCount = \App\Models\Service::where('category_id', $category->id)
+                            ->where('status', 'active')
+                            ->count();
+                            
+                        // Default placeholder images if none is provided
+                        $images = [
+                            'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1605152276897-4f618f831968?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1590402494610-2c378a9114c6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1533745848184-3db07256e163?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                            'https://images.unsplash.com/photo-1576678927484-cc907957088c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80',
+                        ];
+                        $image = $category->icon_url ?? $images[$index % count($images)];
+                        
+                        // Get subcategories or tags
+                        $subcategories = $category->subcategories ?? collect([]);
+                        
+                        // Generate tags if no subcategories
+                        $tags = [];
+                        if ($subcategories->isEmpty()) {
+                            // Generate sample tags based on the category name
+                            $categoryWords = explode(' ', $category->name);
+                            if (count($categoryWords) > 1) {
+                                $tags = $categoryWords;
+                            } else {
+                                // Default tags based on category type
+                                $defaultTags = [
+                                    'Professional' => ['Service', 'Expert', 'Certified'],
+                                    'Technology' => ['Development', 'Support', 'Consulting'],
+                                    'Home' => ['Cleaning', 'Repair', 'Maintenance'],
+                                    'Health' => ['Wellness', 'Fitness', 'Care'],
+                                    'Automotive' => ['Repair', 'Maintenance', 'Detailing'],
+                                    'Education' => ['Tutoring', 'Training', 'Coaching'],
+                                    'Business' => ['Consulting', 'Strategy', 'Support'],
+                                    'Design' => ['Creative', 'Graphics', 'UI/UX'],
+                                    'Marketing' => ['SEO', 'Social Media', 'Content'],
+                                    'Photography' => ['Portrait', 'Events', 'Product'],
+                                ];
+                                
+                                // Find matching category or use default
+                                $found = false;
+                                foreach ($defaultTags as $key => $values) {
+                                    if (stripos($category->name, $key) !== false) {
+                                        $tags = $values;
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (!$found) {
+                                    $tags = $defaultTags['Professional'];
+                                }
+                            }
+                        }
+                    @endphp
+                    
+                    <a href="{{ route('categories.services', $category->id) }}" class="block group">
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-{{ $colorTheme }}/10">
+                            <div class="h-40 overflow-hidden relative">
+                                <img src="{{ $image }}" 
+                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ $category->name }}">
+                                <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
+                                <div class="absolute bottom-4 left-4 flex gap-2">
+                                    <span class="px-3 py-1 rounded-full bg-{{ $colorTheme }}/20 backdrop-blur-sm text-{{ $colorTheme }} text-xs">{{ $serviceCount }} Services</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-xl font-bold text-white">{{ $category->name }}</h3>
+                                    <div class="w-10 h-10 rounded-full bg-{{ $colorTheme }}/10 flex items-center justify-center text-{{ $colorTheme }} group-hover:bg-{{ $colorTheme }} group-hover:text-white transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-gray-400 mb-4">{{ \Illuminate\Support\Str::limit($category->description, 100) }}</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @if($subcategories->isNotEmpty())
+                                        @foreach($subcategories->take(3) as $subcategory)
+                                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">{{ $subcategory->name }}</span>
+                                        @endforeach
+                                    @else
+                                        @foreach($tags as $tag)
+                                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">{{ $tag }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Consultancy, accounting, legal advice, and professional business services.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Consulting</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Legal</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Financial</span>
-                    </div>
+                    </a>
+                @endforeach
+            @else
+                <!-- Fallback for when no categories are available -->
+                <div class="col-span-3 p-8 text-center">
+                    <h3 class="text-2xl font-bold text-white">No categories available</h3>
+                    <p class="text-gray-400 mt-2">Check back soon for new service categories!</p>
                 </div>
-            </div>
-
-            <!-- Category 2 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-secondary/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1605152276897-4f618f831968?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Creative & Design">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-secondary/20 backdrop-blur-sm text-secondary text-xs">38 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Creative & Design</h3>
-                        <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Graphic design, UI/UX design, branding, and creative services for businesses and individuals.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Graphics</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">UI/UX</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Branding</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category 3 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-accent/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Marketing">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-accent/20 backdrop-blur-sm text-accent text-xs">53 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Marketing</h3>
-                        <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Digital marketing, SEO, social media management, content creation and advertising services.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">SEO</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Social Media</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Content</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category 4 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-support/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1590402494610-2c378a9114c6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Automotive">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-support/20 backdrop-blur-sm text-support text-xs">28 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Automotive</h3>
-                        <div class="w-10 h-10 rounded-full bg-support/10 flex items-center justify-center text-support group-hover:bg-support group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Car repair, maintenance, detailing, inspections and automotive support services.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Repair</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Maintenance</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Detailing</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category 5 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1533745848184-3db07256e163?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Photography">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-xs">35 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Photography</h3>
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Portrait photography, event coverage, product photography and photography services.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Portrait</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Events</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Product</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category 6 -->
-            <div class="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-secondary/10">
-                <div class="h-40 overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1576678927484-cc907957088c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Fitness">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <span class="px-3 py-1 rounded-full bg-secondary/20 backdrop-blur-sm text-secondary text-xs">33 Services</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xl font-bold text-white">Fitness</h3>
-                        <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 mb-4">Personal training, fitness coaching, nutrition plans and health consulting services.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Training</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Nutrition</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs">Coaching</span>
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
 
         <!-- View All Button -->
         <div class="flex justify-center pt-12">
-            <a href="#" class="group relative">
+            <a href="{{ route('categories.index') }}" class="group relative">
                 <div class="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-70 group-hover:opacity-100 transition duration-200"></div>
                 <button class="relative px-8 py-3 bg-dark rounded-full flex items-center justify-center group-hover:-translate-y-1 transition-all duration-300">
                     <span class="text-white font-medium mr-2">View All Categories</span>
